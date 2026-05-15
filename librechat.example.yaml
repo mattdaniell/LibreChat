@@ -1546,6 +1546,8 @@ endpoints:
 #   tavilyApiKey: '${TAVILY_API_KEY}'
 #   # Keenable (search provider; keyless by default, a key only lifts rate limits)
 #   keenableApiKey: '${KEENABLE_API_KEY}'
+#   # Parallel (search provider and/or scraper)
+#   parallelApiKey: '${PARALLEL_API_KEY}'
 #   # Content scrapers
 #   firecrawlApiKey: '${FIRECRAWL_API_KEY}'
 #   firecrawlApiUrl: '${FIRECRAWL_API_URL}'
@@ -1665,6 +1667,31 @@ endpoints:
 #     # language: en            # Result language code (default: 'all')
 #     # timeRange: month        # 'day', 'month', or 'year'
 #     # timeout: 10000          # HTTP request timeout in milliseconds (1-120000, default: 10000)
+#
+# Parallel as both search and scraper provider example:
+# webSearch:
+#   searchProvider: parallel
+#   scraperProvider: parallel
+#   parallelApiKey: '${PARALLEL_API_KEY}'
+#   # Optional: custom API URLs (defaults to https://api.parallel.ai/v1/search and https://api.parallel.ai/v1/extract)
+#   # parallelSearchUrl: '${PARALLEL_SEARCH_URL}'
+#   # parallelExtractUrl: '${PARALLEL_EXTRACT_URL}'
+#   parallelSearchOptions:
+#     mode: advanced            # 'basic' for lower latency or 'advanced' for higher quality (default: advanced)
+#     maxResults: 10            # 1-20 results per search
+#     # maxCharsPerResult: 10000 # Maximum excerpt characters per result
+#     # maxCharsTotal: 50000    # Maximum total excerpt characters across all results
+#     # clientModel: gpt-5.4    # Model consuming Parallel results
+#     # includeDomains:         # Restrict search to specific domains
+#     #   - 'example.com'
+#     # excludeDomains:         # Exclude specific domains from results
+#     #   - 'spam.com'
+#     # timeout: 30000          # HTTP request timeout in milliseconds (max 120000)
+#   parallelScraperOptions:
+#     # maxCharsTotal: 50000    # Maximum total excerpt characters across extracted URLs
+#     # clientModel: gpt-5.4    # Model consuming Parallel results
+#     # fullContent: false      # Return full page content in addition to excerpts
+#     # timeout: 30000          # HTTP request timeout in milliseconds (max 120000)
 
 # Memory configuration for user memories
 # memory:

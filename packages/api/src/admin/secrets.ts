@@ -65,6 +65,7 @@ const CONFIG_SECRET_FIELDS: readonly ConfigSecretField[] = (
     { path: 'webSearch.firecrawlApiKey', allowEnvPlaceholder: true, opaque: true },
     { path: 'webSearch.tavilyApiKey', allowEnvPlaceholder: true, opaque: true },
     { path: 'webSearch.keenableApiKey', allowEnvPlaceholder: true, opaque: true },
+    { path: 'webSearch.parallelApiKey', allowEnvPlaceholder: true, opaque: true },
     { path: 'webSearch.jinaApiKey', allowEnvPlaceholder: true, opaque: true },
     { path: 'webSearch.cohereApiKey', allowEnvPlaceholder: true, opaque: true },
     /** No runtime reader yet (`secrets.runtime.spec.ts`), so not known to be read as is. */

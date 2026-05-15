@@ -26,6 +26,10 @@ export const webSearchAuth = {
       keenableApiKey: 0 as const,
       keenableApiUrl: 0 as const,
     },
+    parallel: {
+      parallelApiKey: 1 as const,
+      parallelSearchUrl: 0 as const,
+    },
   },
   scrapers: {
     firecrawl: {
@@ -46,6 +50,10 @@ export const webSearchAuth = {
        * lifts rate limits. The fetch endpoint itself is overridden with the
        * `KEENABLE_FETCH_URL` env var, not through this config. */
       keenableApiKey: 0 as const,
+    },
+    parallel: {
+      parallelApiKey: 1 as const,
+      parallelExtractUrl: 0 as const,
     },
   },
   rerankers: {
@@ -95,6 +103,8 @@ export const webSearchUrlApiKeys: ReadonlyMap<TWebSearchKeys, TWebSearchKeys> = 
   ['tavilySearchUrl', 'tavilyApiKey'],
   ['tavilyExtractUrl', 'tavilyApiKey'],
   ['keenableApiUrl', 'keenableApiKey'],
+  ['parallelSearchUrl', 'parallelApiKey'],
+  ['parallelExtractUrl', 'parallelApiKey'],
 ]);
 
 /** Every web search URL that receives an API key, and every key sent to one. */
@@ -239,6 +249,9 @@ export function loadWebSearchConfig(
   const tavilyExtractUrl = config?.tavilyExtractUrl ?? '${TAVILY_EXTRACT_URL}';
   const keenableApiKey = config?.keenableApiKey ?? '${KEENABLE_API_KEY}';
   const keenableApiUrl = config?.keenableApiUrl ?? '${KEENABLE_API_URL}';
+  const parallelApiKey = config?.parallelApiKey ?? '${PARALLEL_API_KEY}';
+  const parallelSearchUrl = config?.parallelSearchUrl ?? '${PARALLEL_SEARCH_URL}';
+  const parallelExtractUrl = config?.parallelExtractUrl ?? '${PARALLEL_EXTRACT_URL}';
   const jinaApiKey = config?.jinaApiKey ?? '${JINA_API_KEY}';
   const jinaApiUrl = config?.jinaApiUrl ?? '${JINA_API_URL}';
   const cohereApiKey = config?.cohereApiKey ?? '${COHERE_API_KEY}';
@@ -263,6 +276,9 @@ export function loadWebSearchConfig(
     tavilyExtractUrl,
     keenableApiKey,
     keenableApiUrl,
+    parallelApiKey,
+    parallelSearchUrl,
+    parallelExtractUrl,
     firecrawlApiKey,
     firecrawlApiUrl,
     firecrawlVersion,

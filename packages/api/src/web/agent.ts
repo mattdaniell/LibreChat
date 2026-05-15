@@ -18,6 +18,8 @@ const WEB_SEARCH_URL_KEYS = [
   'tavilySearchUrl',
   'tavilyExtractUrl',
   'keenableApiUrl',
+  'parallelSearchUrl',
+  'parallelExtractUrl',
 ] as const;
 
 /**

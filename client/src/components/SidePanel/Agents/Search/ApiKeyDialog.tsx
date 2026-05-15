@@ -145,6 +145,20 @@ export default function ApiKeyDialog({
         },
       },
     },
+    {
+      key: SearchProviders.PARALLEL,
+      label: localize('com_ui_web_search_provider_parallel'),
+      inputs: {
+        parallelApiKey: {
+          placeholder: localize('com_ui_enter_api_key'),
+          type: 'password' as const,
+          link: {
+            url: 'https://platform.parallel.ai',
+            text: localize('com_ui_web_search_provider_parallel_key'),
+          },
+        },
+      },
+    },
   ];
 
   const rerankerOptions: DropdownOption[] = [
@@ -247,6 +261,20 @@ export default function ApiKeyDialog({
           link: {
             url: 'https://keenable.ai',
             text: localize('com_ui_web_search_provider_keenable_key'),
+          },
+        },
+      },
+    },
+    {
+      key: ScraperProviders.PARALLEL,
+      label: localize('com_ui_web_search_scraper_parallel'),
+      inputs: {
+        parallelApiKey: {
+          placeholder: localize('com_ui_enter_api_key'),
+          type: 'password' as const,
+          link: {
+            url: 'https://platform.parallel.ai',
+            text: localize('com_ui_web_search_scraper_parallel_key'),
           },
         },
       },

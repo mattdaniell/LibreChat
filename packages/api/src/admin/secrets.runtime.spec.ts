@@ -329,6 +329,9 @@ const RUNTIME_READERS: Readonly<Record<string, RuntimeReader>> = {
     searchProvider: SearchProviders.TAVILY,
   }),
   'webSearch.keenableApiKey': webSearchReader('keenableApiKey', {}),
+  'webSearch.parallelApiKey': webSearchReader('parallelApiKey', {
+    searchProvider: SearchProviders.PARALLEL,
+  }),
   'webSearch.jinaApiKey': webSearchReader('jinaApiKey', { rerankerType: RerankerTypes.JINA }),
   'webSearch.cohereApiKey': webSearchReader('cohereApiKey', {
     rerankerType: RerankerTypes.COHERE,

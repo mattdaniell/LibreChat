@@ -71,6 +71,9 @@ describe('loadWebSearchConfig', () => {
         tavilyExtractUrl: '${TAVILY_EXTRACT_URL}',
         keenableApiKey: '${KEENABLE_API_KEY}',
         keenableApiUrl: '${KEENABLE_API_URL}',
+        parallelApiKey: '${PARALLEL_API_KEY}',
+        parallelSearchUrl: '${PARALLEL_SEARCH_URL}',
+        parallelExtractUrl: '${PARALLEL_EXTRACT_URL}',
       });
     });
 
@@ -238,6 +241,38 @@ describe('loadWebSearchConfig', () => {
       expect(result?.searxngInstanceUrl).toBe('https://custom-searxng.com');
       expect(result?.firecrawlApiUrl).toBe('https://custom-firecrawl.com');
       expect(result?.jinaApiUrl).toBe('https://custom-jina.com');
+    });
+  });
+
+  describe('Parallel fields', () => {
+    it('defaults Parallel credentials to their environment variables', () => {
+      const result = loadWebSearchConfig({});
+
+      expect(result?.parallelApiKey).toBe('${PARALLEL_API_KEY}');
+      expect(result?.parallelSearchUrl).toBe('${PARALLEL_SEARCH_URL}');
+      expect(result?.parallelExtractUrl).toBe('${PARALLEL_EXTRACT_URL}');
+    });
+
+    it('preserves Parallel providers, URLs and option blocks', () => {
+      const config: TCustomConfig['webSearch'] = {
+        searchProvider: SearchProviders.PARALLEL,
+        scraperProvider: ScraperProviders.PARALLEL,
+        parallelApiKey: 'actual-parallel-key',
+        parallelSearchUrl: 'https://parallel.example/search',
+        parallelExtractUrl: 'https://parallel.example/extract',
+        parallelSearchOptions: { mode: 'advanced', maxResults: 10 },
+        parallelScraperOptions: { maxCharsTotal: 50000, fullContent: false },
+      };
+
+      const result = loadWebSearchConfig(config);
+
+      expect(result?.searchProvider).toBe(SearchProviders.PARALLEL);
+      expect(result?.scraperProvider).toBe(ScraperProviders.PARALLEL);
+      expect(result?.parallelApiKey).toBe('actual-parallel-key');
+      expect(result?.parallelSearchUrl).toBe('https://parallel.example/search');
+      expect(result?.parallelExtractUrl).toBe('https://parallel.example/extract');
+      expect(result?.parallelSearchOptions).toEqual(config.parallelSearchOptions);
+      expect(result?.parallelScraperOptions).toEqual(config.parallelScraperOptions);
     });
   });
 });
