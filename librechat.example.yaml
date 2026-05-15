@@ -131,6 +131,11 @@ interface:
     create: true
     share: false
     public: false
+  skills:
+    use: true
+    create: true
+    share: false
+    public: false
   peoplePicker:
     users: true
     groups: true
@@ -357,7 +362,7 @@ endpoints:
   #   # Set to 0.0 to show all sources (no filtering), or higher like 0.7 for stricter filtering
   #   minRelevanceScore: 0.45
   #   # (optional) Agent Capabilities available to all users. Omit the ones you wish to exclude. Defaults to list below.
-  #   capabilities: ["deferred_tools", "execute_code", "file_search", "actions", "tools"]
+  #   capabilities: ["deferred_tools", "execute_code", "file_search", "actions", "context", "skills", "tools"]
 
   # Anthropic endpoint configuration with Vertex AI support
   # Use this to run Anthropic Claude models through Google Cloud Vertex AI
@@ -672,6 +677,8 @@ endpoints:
 #   searxngApiKey: '${SEARXNG_API_KEY}'
 #   # Tavily (search provider and/or scraper)
 #   tavilyApiKey: '${TAVILY_API_KEY}'
+#   # Parallel (search provider and/or scraper)
+#   parallelApiKey: '${PARALLEL_API_KEY}'
 #   # Content scrapers
 #   firecrawlApiKey: '${FIRECRAWL_API_KEY}'
 #   firecrawlApiUrl: '${FIRECRAWL_API_URL}'
@@ -707,6 +714,42 @@ endpoints:
 #     # includeFavicon: false   # Include favicon URL for each result
 #     # format: markdown        # 'markdown' (default) or 'text' (plain text, may increase latency)
 #     # timeout: 15000          # HTTP request timeout in milliseconds (max 120000); Tavily Extract receives seconds clamped to 1-60
+#
+# Parallel as both search and scraper provider example:
+# webSearch:
+#   searchProvider: parallel
+#   scraperProvider: parallel
+#   parallelApiKey: '${PARALLEL_API_KEY}'
+#   # Optional: custom API URLs (defaults to https://api.parallel.ai/v1/search and https://api.parallel.ai/v1/extract)
+#   # parallelSearchUrl: '${PARALLEL_SEARCH_URL}'
+#   # parallelExtractUrl: '${PARALLEL_EXTRACT_URL}'
+#   parallelSearchOptions:
+#     mode: advanced            # 'basic' for lower latency or 'advanced' for higher quality (default: advanced)
+#     maxResults: 10            # 1-20 results per search
+#     # maxCharsPerResult: 10000 # Maximum excerpt characters per result
+#     # maxCharsTotal: 50000    # Maximum total excerpt characters across all results
+#     # clientModel: gpt-5.4    # Model consuming Parallel results
+#     # location: us            # ISO 3166-1 alpha-2 country code for geo-targeted results
+#     # includeDomains:         # Restrict search to specific domains
+#     #   - 'example.com'
+#     # excludeDomains:         # Exclude specific domains from results
+#     #   - 'spam.com'
+#     # afterDate: '2026-01-01' # Restrict sources to content after this date
+#     # fetchPolicy:
+#     #   maxAgeSeconds: 3600   # Minimum 600 seconds
+#     #   timeoutSeconds: 30
+#     #   disableCacheFallback: false
+#     # timeout: 30000          # HTTP request timeout in milliseconds (max 120000)
+#   parallelScraperOptions:
+#     # maxCharsPerResult: 10000 # Maximum excerpt characters per extracted URL
+#     # maxCharsTotal: 50000    # Maximum total excerpt characters across extracted URLs
+#     # clientModel: gpt-5.4    # Model consuming Parallel results
+#     # fullContent: false      # true, false, or { maxCharsPerResult: 50000 }
+#     # fetchPolicy:
+#     #   maxAgeSeconds: 3600   # Minimum 600 seconds
+#     #   timeoutSeconds: 30
+#     #   disableCacheFallback: false
+#     # timeout: 30000          # HTTP request timeout in milliseconds (max 120000)
 
 # Memory configuration for user memories
 # memory:

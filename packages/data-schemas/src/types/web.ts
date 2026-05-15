@@ -10,6 +10,9 @@ export type TWebSearchKeys =
   | 'tavilyApiKey'
   | 'tavilySearchUrl'
   | 'tavilyExtractUrl'
+  | 'parallelApiKey'
+  | 'parallelSearchUrl'
+  | 'parallelExtractUrl'
   | 'jinaApiKey'
   | 'jinaApiUrl'
   | 'cohereApiKey';

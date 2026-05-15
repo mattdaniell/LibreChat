@@ -6,6 +6,8 @@ import {
   configSchema,
   excludedKeys,
   resolveEndpointType,
+  SearchProviders,
+  ScraperProviders,
   webSearchSchema,
 } from './config';
 
@@ -525,6 +527,86 @@ describe('webSearchSchema', () => {
     expect(() =>
       webSearchSchema.parse({
         tavilyScraperOptions: {
+          timeout: 120001,
+        },
+      }),
+    ).toThrow();
+  });
+
+  it('accepts Parallel providers and options', () => {
+    const result = webSearchSchema.parse({
+      searchProvider: SearchProviders.PARALLEL,
+      scraperProvider: ScraperProviders.PARALLEL,
+      parallelSearchOptions: {
+        mode: 'advanced',
+        maxResults: 10,
+        maxCharsPerResult: 10000,
+        maxCharsTotal: 50000,
+        includeDomains: ['example.com'],
+        excludeDomains: ['spam.com'],
+        afterDate: '2026-01-01',
+        location: 'us',
+        fetchPolicy: {
+          maxAgeSeconds: 3600,
+          timeoutSeconds: 30,
+          disableCacheFallback: false,
+        },
+        timeout: 30000,
+      },
+      parallelScraperOptions: {
+        maxCharsPerResult: 10000,
+        maxCharsTotal: 50000,
+        fullContent: {
+          maxCharsPerResult: 50000,
+        },
+        fetchPolicy: {
+          maxAgeSeconds: 3600,
+          timeoutSeconds: 30,
+          disableCacheFallback: false,
+        },
+        timeout: 30000,
+      },
+    });
+
+    expect(result.searchProvider).toBe(SearchProviders.PARALLEL);
+    expect(result.scraperProvider).toBe(ScraperProviders.PARALLEL);
+    expect(result.parallelSearchOptions?.mode).toBe('advanced');
+    expect(result.parallelSearchOptions?.maxResults).toBe(10);
+    expect(result.parallelScraperOptions?.fullContent).toEqual({
+      maxCharsPerResult: 50000,
+    });
+  });
+
+  it('rejects invalid Parallel options', () => {
+    expect(() =>
+      webSearchSchema.parse({
+        parallelSearchOptions: {
+          mode: 'invalid',
+        },
+      }),
+    ).toThrow();
+
+    expect(() =>
+      webSearchSchema.parse({
+        parallelSearchOptions: {
+          maxResults: 0,
+        },
+      }),
+    ).toThrow();
+
+    expect(() =>
+      webSearchSchema.parse({
+        parallelSearchOptions: {
+          fetchPolicy: {
+            maxAgeSeconds: 599,
+          },
+        },
+      }),
+    ).toThrow();
+
+    expect(() =>
+      webSearchSchema.parse({
+        parallelScraperOptions: {
           timeout: 120001,
         },
       }),

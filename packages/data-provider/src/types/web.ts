@@ -12,8 +12,8 @@ export enum DATE_RANGE {
   PAST_YEAR = 'y',
 }
 
-export type SearchProvider = 'serper' | 'searxng' | 'tavily';
-export type ScraperProvider = 'firecrawl' | 'serper' | 'tavily';
+export type SearchProvider = 'serper' | 'searxng' | 'tavily' | 'parallel';
+export type ScraperProvider = 'firecrawl' | 'serper' | 'tavily' | 'parallel';
 export type RerankerType = 'infinity' | 'jina' | 'cohere' | 'none';
 
 export interface Highlight {
@@ -79,6 +79,9 @@ export interface SearchConfig {
   tavilyApiKey?: string;
   tavilySearchUrl?: string;
   tavilySearchOptions?: TavilyConfig['tavilySearchOptions'];
+  parallelApiKey?: string;
+  parallelSearchUrl?: string;
+  parallelSearchOptions?: ParallelConfig['parallelSearchOptions'];
 }
 
 export type References = {
@@ -141,6 +144,14 @@ export interface TavilyConfig {
   tavilyExtractUrl?: string;
   tavilySearchOptions?: z.infer<typeof webSearchSchema>['tavilySearchOptions'];
   tavilyScraperOptions?: z.infer<typeof webSearchSchema>['tavilyScraperOptions'];
+}
+
+export interface ParallelConfig {
+  parallelApiKey?: string;
+  parallelSearchUrl?: string;
+  parallelExtractUrl?: string;
+  parallelSearchOptions?: z.infer<typeof webSearchSchema>['parallelSearchOptions'];
+  parallelScraperOptions?: z.infer<typeof webSearchSchema>['parallelScraperOptions'];
 }
 
 export interface ScraperContentResult {

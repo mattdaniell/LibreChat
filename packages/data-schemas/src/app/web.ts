@@ -16,6 +16,10 @@ export const webSearchAuth = {
       tavilyApiKey: 1 as const,
       tavilySearchUrl: 0 as const,
     },
+    parallel: {
+      parallelApiKey: 1 as const,
+      parallelSearchUrl: 0 as const,
+    },
   },
   scrapers: {
     firecrawl: {
@@ -30,6 +34,10 @@ export const webSearchAuth = {
     tavily: {
       tavilyApiKey: 1 as const,
       tavilyExtractUrl: 0 as const,
+    },
+    parallel: {
+      parallelApiKey: 1 as const,
+      parallelExtractUrl: 0 as const,
     },
   },
   rerankers: {
@@ -80,6 +88,9 @@ export function loadWebSearchConfig(
   const tavilyApiKey = config?.tavilyApiKey ?? '${TAVILY_API_KEY}';
   const tavilySearchUrl = config?.tavilySearchUrl ?? '${TAVILY_SEARCH_URL}';
   const tavilyExtractUrl = config?.tavilyExtractUrl ?? '${TAVILY_EXTRACT_URL}';
+  const parallelApiKey = config?.parallelApiKey ?? '${PARALLEL_API_KEY}';
+  const parallelSearchUrl = config?.parallelSearchUrl ?? '${PARALLEL_SEARCH_URL}';
+  const parallelExtractUrl = config?.parallelExtractUrl ?? '${PARALLEL_EXTRACT_URL}';
   const jinaApiKey = config?.jinaApiKey ?? '${JINA_API_KEY}';
   const jinaApiUrl = config?.jinaApiUrl ?? '${JINA_API_URL}';
   const cohereApiKey = config?.cohereApiKey ?? '${COHERE_API_KEY}';
@@ -97,6 +108,9 @@ export function loadWebSearchConfig(
     tavilyApiKey,
     tavilySearchUrl,
     tavilyExtractUrl,
+    parallelApiKey,
+    parallelSearchUrl,
+    parallelExtractUrl,
     firecrawlApiKey,
     firecrawlApiUrl,
     firecrawlVersion,
