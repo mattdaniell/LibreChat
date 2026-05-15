@@ -1147,12 +1147,14 @@ export enum SearchProviders {
   SERPER = 'serper',
   SEARXNG = 'searxng',
   TAVILY = 'tavily',
+  PARALLEL = 'parallel',
 }
 
 export enum ScraperProviders {
   FIRECRAWL = 'firecrawl',
   SERPER = 'serper',
   TAVILY = 'tavily',
+  PARALLEL = 'parallel',
 }
 
 export enum RerankerTypes {
@@ -1177,6 +1179,9 @@ export const webSearchSchema = z.object({
   tavilyApiKey: z.string().optional().default('${TAVILY_API_KEY}'),
   tavilySearchUrl: z.string().optional().default('${TAVILY_SEARCH_URL}'),
   tavilyExtractUrl: z.string().optional().default('${TAVILY_EXTRACT_URL}'),
+  parallelApiKey: z.string().optional().default('${PARALLEL_API_KEY}'),
+  parallelSearchUrl: z.string().optional().default('${PARALLEL_SEARCH_URL}'),
+  parallelExtractUrl: z.string().optional().default('${PARALLEL_EXTRACT_URL}'),
   jinaApiKey: z.string().optional().default('${JINA_API_KEY}'),
   jinaApiUrl: z.string().optional().default('${JINA_API_URL}'),
   cohereApiKey: z.string().optional().default('${COHERE_API_KEY}'),
@@ -1242,6 +1247,50 @@ export const webSearchSchema = z.object({
       includeImages: z.boolean().optional(),
       includeFavicon: z.boolean().optional(),
       format: z.enum(['markdown', 'text']).optional(),
+      timeout: z.number().int().nonnegative().max(120000).optional(),
+    })
+    .optional(),
+  parallelSearchOptions: z
+    .object({
+      mode: z.enum(['basic', 'advanced']).optional(),
+      maxResults: z.number().int().min(1).max(20).optional(),
+      maxCharsPerResult: z.number().int().positive().optional(),
+      maxCharsTotal: z.number().int().positive().optional(),
+      clientModel: z.string().optional(),
+      includeDomains: z.array(z.string()).optional(),
+      excludeDomains: z.array(z.string()).optional(),
+      afterDate: z.string().optional(),
+      location: z.string().optional(),
+      fetchPolicy: z
+        .object({
+          maxAgeSeconds: z.number().int().min(600).optional(),
+          timeoutSeconds: z.number().positive().optional(),
+          disableCacheFallback: z.boolean().optional(),
+        })
+        .optional(),
+      timeout: z.number().int().nonnegative().max(120000).optional(),
+    })
+    .optional(),
+  parallelScraperOptions: z
+    .object({
+      maxCharsPerResult: z.number().int().positive().optional(),
+      maxCharsTotal: z.number().int().positive().optional(),
+      clientModel: z.string().optional(),
+      fullContent: z
+        .union([
+          z.boolean(),
+          z.object({
+            maxCharsPerResult: z.number().int().positive().optional(),
+          }),
+        ])
+        .optional(),
+      fetchPolicy: z
+        .object({
+          maxAgeSeconds: z.number().int().min(600).optional(),
+          timeoutSeconds: z.number().positive().optional(),
+          disableCacheFallback: z.boolean().optional(),
+        })
+        .optional(),
       timeout: z.number().int().nonnegative().max(120000).optional(),
     })
     .optional(),

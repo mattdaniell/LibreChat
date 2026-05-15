@@ -60,6 +60,9 @@ describe('loadWebSearchConfig', () => {
         tavilyApiKey: '${TAVILY_API_KEY}',
         tavilySearchUrl: '${TAVILY_SEARCH_URL}',
         tavilyExtractUrl: '${TAVILY_EXTRACT_URL}',
+        parallelApiKey: '${PARALLEL_API_KEY}',
+        parallelSearchUrl: '${PARALLEL_SEARCH_URL}',
+        parallelExtractUrl: '${PARALLEL_EXTRACT_URL}',
       });
     });
 
@@ -134,6 +137,7 @@ describe('loadWebSearchConfig', () => {
       expect(result?.firecrawlApiKey).toBe('${FIRECRAWL_API_KEY}');
       expect(result?.jinaApiKey).toBe('${JINA_API_KEY}');
       expect(result?.cohereApiKey).toBe('${COHERE_API_KEY}');
+      expect(result?.parallelApiKey).toBe('${PARALLEL_API_KEY}');
     });
 
     it('should preserve custom API keys', () => {
@@ -141,6 +145,7 @@ describe('loadWebSearchConfig', () => {
         serperApiKey: 'actual-serper-key',
         jinaApiKey: 'actual-jina-key',
         cohereApiKey: 'actual-cohere-key',
+        parallelApiKey: 'actual-parallel-key',
       };
 
       const result = loadWebSearchConfig(config);
@@ -148,6 +153,7 @@ describe('loadWebSearchConfig', () => {
       expect(result?.serperApiKey).toBe('actual-serper-key');
       expect(result?.jinaApiKey).toBe('actual-jina-key');
       expect(result?.cohereApiKey).toBe('actual-cohere-key');
+      expect(result?.parallelApiKey).toBe('actual-parallel-key');
     });
   });
 
@@ -158,6 +164,8 @@ describe('loadWebSearchConfig', () => {
       expect(result?.searxngInstanceUrl).toBe('${SEARXNG_INSTANCE_URL}');
       expect(result?.firecrawlApiUrl).toBe('${FIRECRAWL_API_URL}');
       expect(result?.jinaApiUrl).toBe('${JINA_API_URL}');
+      expect(result?.parallelSearchUrl).toBe('${PARALLEL_SEARCH_URL}');
+      expect(result?.parallelExtractUrl).toBe('${PARALLEL_EXTRACT_URL}');
     });
 
     it('should preserve custom URLs', () => {
@@ -165,6 +173,8 @@ describe('loadWebSearchConfig', () => {
         searxngInstanceUrl: 'https://custom-searxng.com',
         firecrawlApiUrl: 'https://custom-firecrawl.com',
         jinaApiUrl: 'https://custom-jina.com',
+        parallelSearchUrl: 'https://custom-parallel-search.example/search',
+        parallelExtractUrl: 'https://custom-parallel-extract.example/extract',
       };
 
       const result = loadWebSearchConfig(config);
@@ -172,6 +182,32 @@ describe('loadWebSearchConfig', () => {
       expect(result?.searxngInstanceUrl).toBe('https://custom-searxng.com');
       expect(result?.firecrawlApiUrl).toBe('https://custom-firecrawl.com');
       expect(result?.jinaApiUrl).toBe('https://custom-jina.com');
+      expect(result?.parallelSearchUrl).toBe('https://custom-parallel-search.example/search');
+      expect(result?.parallelExtractUrl).toBe('https://custom-parallel-extract.example/extract');
+    });
+  });
+
+  describe('Parallel fields', () => {
+    it('should preserve Parallel provider, scraper, and option blocks', () => {
+      const config: TCustomConfig['webSearch'] = {
+        searchProvider: SearchProviders.PARALLEL,
+        scraperProvider: ScraperProviders.PARALLEL,
+        parallelSearchOptions: {
+          mode: 'advanced',
+          maxResults: 10,
+        },
+        parallelScraperOptions: {
+          maxCharsTotal: 50000,
+          fullContent: false,
+        },
+      };
+
+      const result = loadWebSearchConfig(config);
+
+      expect(result?.searchProvider).toBe(SearchProviders.PARALLEL);
+      expect(result?.scraperProvider).toBe(ScraperProviders.PARALLEL);
+      expect(result?.parallelSearchOptions).toEqual(config.parallelSearchOptions);
+      expect(result?.parallelScraperOptions).toEqual(config.parallelScraperOptions);
     });
   });
 });

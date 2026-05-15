@@ -30,6 +30,8 @@ const USER_PROVIDED_URL_KEYS = new Set<TWebSearchKeys>([
 const USER_PROVIDED_OPT_IN_URL_KEYS = new Set<TWebSearchKeys>([
   'tavilySearchUrl',
   'tavilyExtractUrl',
+  'parallelSearchUrl',
+  'parallelExtractUrl',
 ]);
 
 function isUserProvidedEnabled(field: string): boolean {
@@ -277,18 +279,22 @@ export async function loadWebSearchAuth({
   let scraperOptionsTimeout: number | undefined;
   if (scraperProvider === ScraperProviders.TAVILY) {
     scraperOptionsTimeout = webSearchConfig?.tavilyScraperOptions?.timeout;
+  } else if (scraperProvider === ScraperProviders.PARALLEL) {
+    scraperOptionsTimeout = webSearchConfig?.parallelScraperOptions?.timeout;
   } else if (scraperProvider === ScraperProviders.FIRECRAWL) {
     scraperOptionsTimeout = webSearchConfig?.firecrawlOptions?.timeout;
   }
 
   const searchProvider = authResult.searchProvider ?? webSearchConfig?.searchProvider;
-  if (searchProvider !== SearchProviders.TAVILY) {
+  if (searchProvider !== SearchProviders.TAVILY && searchProvider !== SearchProviders.PARALLEL) {
     authResult.safeSearch = webSearchConfig?.safeSearch ?? SafeSearchTypes.MODERATE;
   }
   authResult.scraperTimeout = webSearchConfig?.scraperTimeout ?? scraperOptionsTimeout ?? 7500;
   authResult.firecrawlOptions = webSearchConfig?.firecrawlOptions;
   authResult.tavilySearchOptions = webSearchConfig?.tavilySearchOptions;
   authResult.tavilyScraperOptions = webSearchConfig?.tavilyScraperOptions;
+  authResult.parallelSearchOptions = webSearchConfig?.parallelSearchOptions;
+  authResult.parallelScraperOptions = webSearchConfig?.parallelScraperOptions;
 
   return {
     authTypes,

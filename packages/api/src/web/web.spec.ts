@@ -365,6 +365,124 @@ describe('web.ts', () => {
       }
     });
 
+    it('should ignore user-provided Parallel custom URLs unless explicitly enabled', async () => {
+      const originalEnv = process.env;
+      try {
+        process.env = {
+          ...originalEnv,
+          PARALLEL_API_KEY: 'system-parallel-api-key',
+          PARALLEL_SEARCH_URL: 'https://api.parallel.ai/v1/search',
+          PARALLEL_EXTRACT_URL: 'https://api.parallel.ai/v1/extract',
+        };
+
+        const parallelConfig = {
+          parallelApiKey: '${PARALLEL_API_KEY}',
+          parallelSearchUrl: '${PARALLEL_SEARCH_URL}',
+          parallelExtractUrl: '${PARALLEL_EXTRACT_URL}',
+          searchProvider: 'parallel' as SearchProviders,
+          scraperProvider: 'parallel' as ScraperProviders,
+          rerankerType: 'none' as RerankerTypes,
+        } as TWebSearchConfig;
+
+        mockLoadAuthValues.mockImplementation(({ authFields }) => {
+          const result: Record<string, string> = {};
+          authFields.forEach((field: string) => {
+            if (field === 'PARALLEL_API_KEY') {
+              result[field] = 'system-parallel-api-key';
+            } else if (field === 'PARALLEL_SEARCH_URL') {
+              result[field] = 'https://attacker.example/search';
+            } else if (field === 'PARALLEL_EXTRACT_URL') {
+              result[field] = 'https://attacker.example/extract';
+            }
+          });
+          return Promise.resolve(result);
+        });
+
+        const result = await loadWebSearchAuth({
+          userId,
+          webSearchConfig: parallelConfig,
+          loadAuthValues: mockLoadAuthValues,
+        });
+
+        expect(result.authenticated).toBe(true);
+        expect(result.authResult.searchProvider).toBe('parallel');
+        expect(result.authResult.scraperProvider).toBe('parallel');
+        expect(result.authResult.parallelApiKey).toBe('system-parallel-api-key');
+        expect(result.authResult.parallelSearchUrl).toBeUndefined();
+        expect(result.authResult.parallelExtractUrl).toBeUndefined();
+        expect(result.authResult.safeSearch).toBeUndefined();
+      } finally {
+        process.env = originalEnv;
+      }
+    });
+
+    it('should allow user-provided Parallel custom URLs when explicitly enabled', async () => {
+      mockIsSSRFTarget.mockReturnValue(false);
+      mockResolveHostnameSSRF.mockResolvedValue(false);
+
+      const originalEnv = process.env;
+      try {
+        process.env = {
+          ...originalEnv,
+          PARALLEL_API_KEY: 'system-parallel-api-key',
+          PARALLEL_SEARCH_URL: AuthType.USER_PROVIDED,
+          PARALLEL_EXTRACT_URL: AuthType.USER_PROVIDED,
+        };
+
+        const parallelConfig = {
+          parallelApiKey: '${PARALLEL_API_KEY}',
+          parallelSearchUrl: '${PARALLEL_SEARCH_URL}',
+          parallelExtractUrl: '${PARALLEL_EXTRACT_URL}',
+          searchProvider: 'parallel' as SearchProviders,
+          scraperProvider: 'parallel' as ScraperProviders,
+          rerankerType: 'none' as RerankerTypes,
+          parallelSearchOptions: {
+            mode: 'advanced',
+            maxResults: 10,
+          },
+          parallelScraperOptions: {
+            maxCharsTotal: 50000,
+            timeout: 30000,
+          },
+        } as TWebSearchConfig;
+
+        mockLoadAuthValues.mockImplementation(({ authFields }) => {
+          const result: Record<string, string> = {};
+          authFields.forEach((field: string) => {
+            if (field === 'PARALLEL_API_KEY') {
+              result[field] = 'system-parallel-api-key';
+            } else if (field === 'PARALLEL_SEARCH_URL') {
+              result[field] = 'https://tenant-search.example/search';
+            } else if (field === 'PARALLEL_EXTRACT_URL') {
+              result[field] = 'https://tenant-extract.example/extract';
+            }
+          });
+          return Promise.resolve(result);
+        });
+
+        const result = await loadWebSearchAuth({
+          userId,
+          webSearchConfig: parallelConfig,
+          loadAuthValues: mockLoadAuthValues,
+        });
+
+        expect(result.authenticated).toBe(true);
+        expect(result.authResult.parallelSearchUrl).toBe('https://tenant-search.example/search');
+        expect(result.authResult.parallelExtractUrl).toBe('https://tenant-extract.example/extract');
+        expect(result.authResult.parallelSearchOptions).toEqual(
+          parallelConfig.parallelSearchOptions,
+        );
+        expect(result.authResult.parallelScraperOptions).toEqual(
+          parallelConfig.parallelScraperOptions,
+        );
+        expect(result.authResult.scraperTimeout).toBe(30000);
+        expect(mockResolveHostnameSSRF).toHaveBeenCalledWith('tenant-search.example');
+        expect(mockResolveHostnameSSRF).toHaveBeenCalledWith('tenant-extract.example');
+      } finally {
+        process.env = originalEnv;
+      }
+    });
+
     it('should preserve safeSearch setting from webSearchConfig', async () => {
       // Mock successful authentication
       mockLoadAuthValues.mockImplementation(({ authFields }) => {
@@ -763,11 +881,17 @@ describe('web.ts', () => {
       // Check providers
       expect(webSearchAuth.providers).toHaveProperty('serper');
       expect(webSearchAuth.providers.serper).toHaveProperty('serperApiKey', 1);
+      expect(webSearchAuth.providers).toHaveProperty('parallel');
+      expect(webSearchAuth.providers.parallel).toHaveProperty('parallelApiKey', 1);
+      expect(webSearchAuth.providers.parallel).toHaveProperty('parallelSearchUrl', 0);
 
       // Check scrapers
       expect(webSearchAuth.scrapers).toHaveProperty('firecrawl');
       expect(webSearchAuth.scrapers.firecrawl).toHaveProperty('firecrawlApiKey', 1);
       expect(webSearchAuth.scrapers.firecrawl).toHaveProperty('firecrawlApiUrl', 0);
+      expect(webSearchAuth.scrapers).toHaveProperty('parallel');
+      expect(webSearchAuth.scrapers.parallel).toHaveProperty('parallelApiKey', 1);
+      expect(webSearchAuth.scrapers.parallel).toHaveProperty('parallelExtractUrl', 0);
 
       // Check rerankers
       expect(webSearchAuth.rerankers).toHaveProperty('jina');
@@ -779,7 +903,9 @@ describe('web.ts', () => {
     it('should mark required keys with value 1', () => {
       // All keys with value 1 are required
       expect(webSearchAuth.providers.serper.serperApiKey).toBe(1);
+      expect(webSearchAuth.providers.parallel.parallelApiKey).toBe(1);
       expect(webSearchAuth.scrapers.firecrawl.firecrawlApiKey).toBe(1);
+      expect(webSearchAuth.scrapers.parallel.parallelApiKey).toBe(1);
       expect(webSearchAuth.rerankers.jina.jinaApiKey).toBe(1);
       expect(webSearchAuth.rerankers.cohere.cohereApiKey).toBe(1);
     });
@@ -787,6 +913,8 @@ describe('web.ts', () => {
     it('should mark optional keys with value 0', () => {
       // Keys with value 0 are optional
       expect(webSearchAuth.scrapers.firecrawl.firecrawlApiUrl).toBe(0);
+      expect(webSearchAuth.providers.parallel.parallelSearchUrl).toBe(0);
+      expect(webSearchAuth.scrapers.parallel.parallelExtractUrl).toBe(0);
     });
   });
   describe('loadWebSearchAuth with specific services', () => {

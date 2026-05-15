@@ -98,6 +98,17 @@ describe('ApiKeyDialog', () => {
     expect(screen.getByText('com_ui_web_search_reranker_cohere_key')).toBeInTheDocument();
   });
 
+  it('shows Parallel provider and scraper options', () => {
+    mockUseGetStartupConfig.mockReturnValue({ data: {} });
+    render(<ApiKeyDialog {...defaultProps} />);
+
+    fireEvent.click(screen.getByText('com_ui_web_search_provider_parallel'));
+    expect(screen.getByText('com_ui_web_search_provider_parallel_key')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('com_ui_web_search_scraper_parallel'));
+    expect(screen.getByText('com_ui_web_search_scraper_parallel_key')).toBeInTheDocument();
+  });
+
   it('does not render provider section if SYSTEM_DEFINED', () => {
     mockUseGetStartupConfig.mockReturnValue({ data: {} });
     const props = {
