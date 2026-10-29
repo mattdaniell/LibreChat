@@ -2566,6 +2566,54 @@ describe('webSearchSchema', () => {
       }),
     ).toThrow();
   });
+
+  it('accepts Parallel providers and option blocks', () => {
+    const result = webSearchSchema.parse({
+      searchProvider: 'parallel',
+      scraperProvider: 'parallel',
+      parallelSearchOptions: {
+        mode: 'advanced',
+        maxResults: 10,
+        maxCharsPerResult: 10000,
+        maxCharsTotal: 50000,
+        includeDomains: ['example.com'],
+        excludeDomains: ['spam.com'],
+        timeout: 30000,
+      },
+      parallelScraperOptions: {
+        maxCharsPerResult: 4000,
+        maxCharsTotal: 50000,
+        fullContent: true,
+        timeout: 30000,
+      },
+    });
+
+    expect(result.searchProvider).toBe('parallel');
+    expect(result.scraperProvider).toBe('parallel');
+    expect(result.parallelApiKey).toBe('${PARALLEL_API_KEY}');
+    expect(result.parallelSearchOptions?.mode).toBe('advanced');
+    for (const mode of ['turbo', 'fast', 'basic', 'advanced'] as const) {
+      expect(
+        webSearchSchema.parse({ parallelSearchOptions: { mode } }).parallelSearchOptions?.mode,
+      ).toBe(mode);
+    }
+    expect(result.parallelSearchOptions?.includeDomains).toEqual(['example.com']);
+    expect(result.parallelScraperOptions?.fullContent).toBe(true);
+    expect(result.parallelScraperOptions?.maxCharsPerResult).toBe(4000);
+  });
+
+  it('rejects out-of-range Parallel options', () => {
+    const invalid = [
+      { parallelSearchOptions: { mode: 'invalid' } },
+      { parallelSearchOptions: { mode: 'ultra' } },
+      { parallelSearchOptions: { maxResults: 0 } },
+      { parallelScraperOptions: { fullContent: { maxCharsPerResult: 50000 } } },
+      { parallelScraperOptions: { timeout: 120001 } },
+    ];
+    for (const config of invalid) {
+      expect(() => webSearchSchema.parse(config)).toThrow();
+    }
+  });
 });
 
 describe('bedrockModels defaults', () => {

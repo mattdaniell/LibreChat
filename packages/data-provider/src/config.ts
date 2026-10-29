@@ -3819,6 +3819,7 @@ export enum SearchProviders {
   SEARXNG = 'searxng',
   TAVILY = 'tavily',
   KEENABLE = 'keenable',
+  PARALLEL = 'parallel',
 }
 
 export enum ScraperProviders {
@@ -3826,6 +3827,7 @@ export enum ScraperProviders {
   SERPER = 'serper',
   TAVILY = 'tavily',
   KEENABLE = 'keenable',
+  PARALLEL = 'parallel',
 }
 
 export enum RerankerTypes {
@@ -3874,6 +3876,10 @@ export const webSearchSchema = z.object({
   keenableApiKey: z.string().optional().default('${KEENABLE_API_KEY}'),
   keenableApiKeyPreview: apiKeyPreviewSchema,
   keenableApiUrl: z.string().optional().default('${KEENABLE_API_URL}'),
+  parallelApiKey: z.string().optional().default('${PARALLEL_API_KEY}'),
+  parallelApiKeyPreview: apiKeyPreviewSchema,
+  parallelSearchUrl: z.string().optional().default('${PARALLEL_SEARCH_URL}'),
+  parallelExtractUrl: z.string().optional().default('${PARALLEL_EXTRACT_URL}'),
   jinaApiKey: z.string().optional().default('${JINA_API_KEY}'),
   jinaApiKeyPreview: apiKeyPreviewSchema,
   jinaApiUrl: z.string().optional().default('${JINA_API_URL}'),
@@ -3966,6 +3972,27 @@ export const webSearchSchema = z.object({
   keenableScraperOptions: z
     .object({
       attributionTitle: z.string().optional(),
+      timeout: z.number().int().nonnegative().max(120000).optional(),
+    })
+    .optional(),
+  parallelSearchOptions: z
+    .object({
+      mode: z.enum(['turbo', 'fast', 'basic', 'advanced']).optional(),
+      maxResults: z.number().int().min(1).max(20).optional(),
+      maxCharsPerResult: z.number().int().positive().optional(),
+      maxCharsTotal: z.number().int().positive().optional(),
+      clientModel: z.string().optional(),
+      includeDomains: z.array(z.string()).optional(),
+      excludeDomains: z.array(z.string()).optional(),
+      timeout: z.number().int().nonnegative().max(120000).optional(),
+    })
+    .optional(),
+  parallelScraperOptions: z
+    .object({
+      maxCharsPerResult: z.number().int().positive().optional(),
+      maxCharsTotal: z.number().int().positive().optional(),
+      clientModel: z.string().optional(),
+      fullContent: z.boolean().optional(),
       timeout: z.number().int().nonnegative().max(120000).optional(),
     })
     .optional(),

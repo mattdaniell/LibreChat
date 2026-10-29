@@ -26,6 +26,8 @@ import { resolveStoredConfigSecret } from '~/admin/secrets';
 const USER_PROVIDED_OPT_IN_URL_KEYS = new Set<TWebSearchKeys>([
   'tavilySearchUrl',
   'tavilyExtractUrl',
+  'parallelSearchUrl',
+  'parallelExtractUrl',
 ]);
 
 /**
@@ -60,7 +62,9 @@ type WebSearchOptionBlock =
   | 'tavilySearchOptions'
   | 'tavilyScraperOptions'
   | 'keenableSearchOptions'
-  | 'keenableScraperOptions';
+  | 'keenableScraperOptions'
+  | 'parallelSearchOptions'
+  | 'parallelScraperOptions';
 
 const WEB_SEARCH_OPTION_BLOCKS: readonly WebSearchOptionBlock[] = [
   'firecrawlOptions',
@@ -69,6 +73,8 @@ const WEB_SEARCH_OPTION_BLOCKS: readonly WebSearchOptionBlock[] = [
   'tavilyScraperOptions',
   'keenableSearchOptions',
   'keenableScraperOptions',
+  'parallelSearchOptions',
+  'parallelScraperOptions',
 ];
 
 /** The fields `webSearchSchema` defines for each provider option block. */
@@ -859,6 +865,8 @@ export async function loadWebSearchAuth({
   let scraperOptionsTimeout: number | undefined;
   if (scraperProvider === ScraperProviders.TAVILY) {
     scraperOptionsTimeout = webSearchConfig?.tavilyScraperOptions?.timeout;
+  } else if (scraperProvider === ScraperProviders.PARALLEL) {
+    scraperOptionsTimeout = webSearchConfig?.parallelScraperOptions?.timeout;
   } else if (scraperProvider === ScraperProviders.FIRECRAWL) {
     scraperOptionsTimeout = webSearchConfig?.firecrawlOptions?.timeout;
   } else if (scraperProvider === ScraperProviders.KEENABLE) {
@@ -866,7 +874,7 @@ export async function loadWebSearchAuth({
   }
 
   const searchProvider = authResult.searchProvider ?? webSearchConfig?.searchProvider;
-  if (searchProvider !== SearchProviders.TAVILY) {
+  if (searchProvider !== SearchProviders.TAVILY && searchProvider !== SearchProviders.PARALLEL) {
     authResult.safeSearch = webSearchConfig?.safeSearch ?? SafeSearchTypes.MODERATE;
   }
   authResult.scraperTimeout = webSearchConfig?.scraperTimeout ?? scraperOptionsTimeout ?? 7500;
@@ -893,6 +901,14 @@ export async function loadWebSearchAuth({
   authResult.keenableScraperOptions = getKeenableScraperOptions(
     pickOptionFields('keenableScraperOptions', webSearchConfig?.keenableScraperOptions),
     scraperProvider === ScraperProviders.KEENABLE ? keenableScraperApiKey : undefined,
+  );
+  authResult.parallelSearchOptions = pickOptionFields(
+    'parallelSearchOptions',
+    webSearchConfig?.parallelSearchOptions,
+  );
+  authResult.parallelScraperOptions = pickOptionFields(
+    'parallelScraperOptions',
+    webSearchConfig?.parallelScraperOptions,
   );
 
   return {
